@@ -45,3 +45,53 @@ p1_data %>%
   
 ```
 
+## Problem 2
+
+```{r read data, message=FALSE}
+homi_raw = read_csv("https://raw.githubusercontent.com/washingtonpost/data-homicides/master/homicide-data.csv")
+```
+
+I found that in row 50810, the state value is wrong, where Tulsa should be in OK instead of AL, so I change it.
+
+```{r data wrangling}
+homi = homi_raw 
+homi[50810, 9] = "OK"
+homi$city_state = paste(homi$city, homi$state, sep = ", ")
+homi = homi %>% 
+  select(-city, -state)
+```
+
+```{r some summarise}
+total_num = homi %>% 
+  group_by(city_state) %>% 
+  summarise(total_num = n())
+
+unsolved_num = homi %>% 
+  filter(disposition == "Closed without arrest" | disposition == "Open/No arrest") %>% 
+  group_by(city_state) %>% 
+  summarise(unsolved_num = n())
+
+```
+
+```{r proportion estimate in Baltimore}
+balto_total = total_num %>%
+  filter(city_state == "Baltimore, MD")
+
+balto_unsolved = unsolved_num %>%
+  filter(city_state == "Baltimore, MD")
+
+balto_prop = prop.test(balto_unsolved$unsolved_num, balto_total$total_num)
+
+balto_prop %>% 
+  broom::tidy() %>% 
+  mutate(city_state = "Baltimore, MD") %>% 
+  select(city_state, estimate, conf.low, conf.high) 
+  
+```
+
+```{r proportion estimate in all cities}
+
+```
+
+
+
