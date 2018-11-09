@@ -105,10 +105,19 @@ total_prop = total_num %>%
 ```{r make a plot}
 total_prop %>% 
   arrange(estimate) %>% 
+  mutate(city_state = factor(city_state, unique(city_state))) %>% 
   ggplot(aes(x = city_state, y = estimate))+
-  geom_boxplot()+
+  geom_point()+
   geom_errorbar(mapping = aes(ymin = conf.low, ymax = conf.high))+
+  labs(
+    title = "Proportion of homicides that are unsolved in each city",
+    x = "City",
+    y = "Estimates Values",
+    caption = "data from The Washington Post "
+  )+
+  theme_bw()+
   theme(axis.text.x = element_text(angle = 90, hjust = 1))
+  
 ```
 
 
